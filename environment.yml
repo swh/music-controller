@@ -1,0 +1,8 @@
+name: music-controller
+dependencies:
+  - pip=24.2
+  - python=3.12
+  - pyserial=3.5
+  - wheel=0.43
+  - pip:
+      - applescript==2021.2.9
