@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   height="10mm"
+   width="10mm"
+   fill="#000000"
+   viewBox="0 0 24 24"
+   version="1.1"
+   x="0px"
+   y="0px"
+   id="svg1"
+   sodipodi:docname="skip.svg"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="22.013333"
+     inkscape:cx="16.240157"
+     inkscape:cy="19.965173"
+     inkscape:window-width="2152"
+     inkscape:window-height="1186"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g1" />
+  <title
+     id="title1">icon/play-pause</title>
+  <desc
+     id="desc1">Created with Sketch.</desc>
+  <g
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     id="g1">
+    <path
+       d="M 2,5 13,12 2,19 Z"
+       fill="#000000"
+       id="path1"
+       sodipodi:nodetypes="cccc" />
+    <path
+       d="m 11.538462,4.9991999 11,7.0000001 -11,7 z"
+       fill="#000000"
+       id="path1-3"
+       sodipodi:nodetypes="cccc" />
+  </g>
+</svg>
