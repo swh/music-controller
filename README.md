@@ -27,7 +27,7 @@ A host program runs on your Mac and bridges the Arduino to Apple Music via Apple
 
 - **Arduino Nano ESP32**
 - **ILI9341 320x240 SPI TFT display**
-- **5 momentary push buttons** (connected to A0–A4)
+- **5 momentary push buttons** (connected to A0-A4)
 - **Rotary encoder** (connected to D2/D3)
 - 3D-printed enclosure (see `CAD/enclosure-row.scad`, requires the [BOSL2](https://github.com/BelfrySCAD/BOSL2) OpenSCAD library)
 
@@ -55,4 +55,4 @@ Plug the controller into your Mac via USB, run the host program, and it will con
 
 ## Licence
 
-BSD 3-Clause — see [LICENSE](LICENSE).
+BSD 3-Clause, see [LICENSE](LICENSE).
