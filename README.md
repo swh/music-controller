@@ -19,7 +19,6 @@ A host program runs on your Mac and bridges the Arduino to Apple Music via Apple
 | Directory | Description |
 |---|---|
 | `controller-host/` | Go host program (preferred) — communicates with the Arduino over serial and controls Apple Music via AppleScript |
-| `desktop/` | Legacy Python host (`monitor.py`) — same functionality, requires a conda environment |
 | `Music_controller_arduino/` | Arduino sketch for the Nano ESP32 — drives the TFT display, reads buttons and rotary encoder |
 | `CAD/` | OpenSCAD enclosure design with SVG button icons |
 
