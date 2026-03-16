@@ -63,100 +63,106 @@ func monitor(portName string) error {
 	}
 	defer port.Close()
 
-	if err := port.SetReadTimeout(time.Second); err != nil {
-		return err
-	}
-
 	w := &serialWriter{port: port}
-	scanner := bufio.NewScanner(port)
+
+	// Read serial lines in a goroutine so we can also run a sync ticker.
+	lines := make(chan string)
+	readErr := make(chan error, 1)
+	go func() {
+		scanner := bufio.NewScanner(port)
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			if line != "" {
+				lines <- line
+			}
+		}
+		readErr <- scanner.Err()
+	}()
 
 	lastTrack := sendAll(w)
 	playing := isPlaying()
 	sendState(w, playing)
-	lastSync := time.Now()
 
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			continue
-		}
+	syncTicker := time.NewTicker(syncEvery)
+	defer syncTicker.Stop()
 
-		cmd := line
-		var arg string
-		if len(line) > 3 {
-			cmd = line[:2]
-			arg = line[3:]
-		} else if len(line) >= 2 {
-			cmd = line[:2]
-		}
-
-		switch cmd {
-		case "PP":
-			tellMusic("playpause")
-			playing = sendState(w, isPlaying())
-			lastTrack = sendAll(w)
-
-		case "LL":
-			playlists, err := tellMusic("get name of every playlist")
-			if err == nil {
-				w.Send("OP " + strings.ReplaceAll(playlists, ", ", "|"))
+	for {
+		select {
+		case line := <-lines:
+			cmd := line
+			var arg string
+			if len(line) > 3 {
+				cmd = line[:2]
+				arg = line[3:]
+			} else if len(line) >= 2 {
+				cmd = line[:2]
 			}
 
-		case "FA":
-			log.Println("Favourite")
-			tellMusic("set favorited of current track to true")
+			switch cmd {
+			case "PP":
+				tellMusic("playpause")
+				playing = sendState(w, isPlaying())
+				lastTrack = sendAll(w)
 
-		case "SK":
-			tellMusic("play next track")
-			lastTrack = sendAll(w)
-			playing = sendState(w, true)
+			case "LL":
+				playlists, err := tellMusic("get name of every playlist")
+				if err == nil {
+					w.Send("OP " + strings.ReplaceAll(playlists, ", ", "|"))
+				}
 
-		case "PL":
-			log.Println("Playing playlist", arg)
-			tellMusic(
-				"set shuffle enabled to false",
-				fmt.Sprintf("set thePlaylist to playlist %q", arg),
-				"play thePlaylist",
-			)
-			playing = sendState(w, true)
-			time.Sleep(time.Second)
-			lastTrack = sendAll(w)
+			case "FA":
+				log.Println("Favourite")
+				tellMusic("set favorited of current track to true")
 
-		case "SH":
-			log.Println("Shuffle playlist", arg)
-			tellMusic(
-				"set shuffle enabled to true",
-				"set shuffle mode to albums",
-				fmt.Sprintf("set thePlaylist to playlist %q", arg),
-				"play thePlaylist",
-			)
+			case "SK":
+				tellMusic("play next track")
+				lastTrack = sendAll(w)
+				playing = sendState(w, true)
 
-		case "JU":
-			log.Println("Jump", arg)
-			tellMusic(fmt.Sprintf("set player position to (player position %s)", arg))
-			sendTrackPos(w)
+			case "PL":
+				log.Println("Playing playlist", arg)
+				tellMusic(
+					"set shuffle enabled to false",
+					fmt.Sprintf("set thePlaylist to playlist %q", arg),
+					"play thePlaylist",
+				)
+				playing = sendState(w, true)
+				time.Sleep(time.Second)
+				lastTrack = sendAll(w)
 
-		case "SY":
-			log.Println("Syncing")
-			lastTrack = sendAll(w)
-			playing = sendState(w, isPlaying())
-			lastSync = time.Now()
+			case "SH":
+				log.Println("Shuffle playlist", arg)
+				tellMusic(
+					"set shuffle enabled to true",
+					"set shuffle mode to albums",
+					fmt.Sprintf("set thePlaylist to playlist %q", arg),
+					"play thePlaylist",
+				)
 
-		case "!!":
-			log.Println("Arduino:", arg)
+			case "JU":
+				log.Println("Jump", arg)
+				tellMusic(fmt.Sprintf("set player position to (player position %s)", arg))
+				sendTrackPos(w)
 
-		default:
-			log.Printf("Unknown command: %s", cmd)
-		}
+			case "SY":
+				log.Println("Syncing")
+				lastTrack = sendAll(w)
+				playing = sendState(w, isPlaying())
 
-		// Periodic sync check after processing each command
-		if time.Since(lastSync) > syncEvery {
+			case "!!":
+				log.Println("Arduino:", arg)
+
+			default:
+				log.Printf("Unknown command: %s", cmd)
+			}
+
+		case <-syncTicker.C:
 			lastTrack, playing = periodicSync(w, lastTrack, playing)
-			lastSync = time.Now()
+
+		case err := <-readErr:
+			return err
 		}
 	}
-
-	return scanner.Err()
 }
 
 // periodicSync checks for track/state changes without being triggered by the Arduino.
