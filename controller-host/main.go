@@ -36,18 +36,24 @@ func main() {
 	}
 }
 
-// findPort discovers the Arduino Nano ESP32 serial port.
+// Arduino Nano ESP32 USB identifiers.
+const (
+	nanoESP32VID = "2341"
+	nanoESP32PID = "0070"
+)
+
+// findPort discovers the Arduino Nano ESP32 serial port by USB VID/PID.
 func findPort() (string, error) {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		return "", err
 	}
 	for _, p := range ports {
-		if p.IsUSB && strings.Contains(p.Product, "Nano ESP32") {
+		if p.IsUSB && p.VID == nanoESP32VID && p.PID == nanoESP32PID {
 			return p.Name, nil
 		}
 	}
-	return "", fmt.Errorf("Nano ESP32 not found")
+	return "", fmt.Errorf("Nano ESP32 not found (VID=%s PID=%s)", nanoESP32VID, nanoESP32PID)
 }
 
 func monitor(portName string) error {
